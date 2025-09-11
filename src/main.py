@@ -1,72 +1,137 @@
+
+"""
+
+OCS2 Configurator
+
+Copyright (C) Souldbminer
+
+This program is free software; you can redistribute it and/or modify it
+under the terms and conditions of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
+
 import dearpygui.dearpygui as dpg
+
+# This prevents the window from reopening when closed
+dpg.create_context()
+
+from PIL import Image
+import numpy as np
+import common as c
+import sys
+import os
+
+import kip as k
 import gpu
 import cpu
 import ram
-from PIL import Image
-import numpy as np
-import psutil
-import os
-import common as c
-dpg.create_context()
+from defaults import d
+import installer as ins
+import about
 
-assets_path="assets/"
+true = True
+false = False
 
-image_path = assets_path + "coolerhd.png"
-image = Image.open(image_path).convert("RGBA")
-image = image.resize((64, 64))
-width, height = image.size
+if getattr(sys, 'frozen', False):
+    assets_path = os.path.join(sys._MEIPASS, 'assets/')
+else:
+    assets_path = os.path.join(os.path.dirname(__file__), '../assets/')
 
-image_data = np.array(image) / 255.0
-image_data = image_data.flatten()
+cooler_image_path = assets_path + "coolerhd.png" # coolerHD Emoji from OC server
+cooler_image = Image.open(cooler_image_path).convert("RGBA")
+cooler_width, cooler_height = cooler_image.size
+
+cooler_image_data = np.array(cooler_image) / 255.0
+cooler_image_data = cooler_image_data.flatten()
+
+lightos_image_path = assets_path + "lightos_c.png"
+lightos_image = Image.open(lightos_image_path).convert("RGBA")
+lightos_width, lightos_height = lightos_image.size
+
+lightos_image_data = np.array(lightos_image) / 255.0
+lightos_image_data = lightos_image_data.flatten()
+
+samy_image_path = assets_path + "samy_c.png"
+samy_image = Image.open(samy_image_path).convert("RGBA")
+samy_width, samy_height = samy_image.size
+
+samy_image_data = np.array(samy_image) / 255.0
+samy_image_data = samy_image_data.flatten()
+
+soul_image_path = assets_path + "soul_c.png"
+soul_image = Image.open(soul_image_path).convert("RGBA")
+soul_width, soul_height = soul_image.size
+
+soul_image_data = np.array(soul_image) / 255.0
+soul_image_data = soul_image_data.flatten()
 
 with dpg.font_registry():
     lexend = dpg.add_font(assets_path + "Lexend.ttf", 16)
+
 with dpg.texture_registry(show=False):
-    dpg.add_static_texture(width=width, height=height, default_value=image_data, tag="coolerhd")
+    dpg.add_static_texture(width=cooler_width, height=cooler_height, default_value=cooler_image_data, tag="coolerhd")
 
+    dpg.add_static_texture(width=lightos_width, height=lightos_height, default_value=lightos_image_data, tag="lightos")
 
-def get_drives():
-    drives = []
-    for part in psutil.disk_partitions(all=False):
-        drives.append(part.device)
-    return drives
+    dpg.add_static_texture(width=samy_width, height=samy_height, default_value=samy_image_data, tag="samy")
 
-drive_list = get_drives()
+    dpg.add_static_texture(width=soul_width, height=soul_height, default_value=soul_image_data, tag="soul")
 
-def check_atmosphere(sender, app_data, user_data):
-    drive = app_data
-    atmosphere_path = os.path.join(drive, "atmosphere")
-    package3_path = os.path.join(atmosphere_path, "package3")
-    if os.path.isfile(f"{atmosphere_path}/kips/loader.kip"):
-        dpg.set_value("status_text", "OCS2 Install Found!")
-    elif os.path.isdir(atmosphere_path) and os.path.isfile(package3_path):
-        dpg.set_value("status_text", "Atmosphere install found!")
-    else:
-        dpg.set_value("status_text", "Atmosphere not found!")
+with dpg.file_dialog(directory_selector=False, show=False, tag="file_dialog", width=500, height=300, modal=True, callback=k.store):
+    dpg.add_file_extension(".kip")
+
 with dpg.window(label="Configurator", width=400, height=300,id="main_window"):
     with dpg.tab_bar():
         with dpg.tab(label="Settings"):
-            dpg.add_text("Installation Drive")
+            dpg.add_separator(label="Installation")
             dpg.add_combo(
-                items=drive_list,
+                items=ins.drive_list,
                 default_value="Select a drive!",
-                callback=check_atmosphere
+                callback=ins.check_atmosphere
             )
+            dpg.add_checkbox(label="Autosave", default_value=false, callback=ins.autosave_toggle)
             dpg.add_text("", tag="status_text")
-            dpg.add_text(c.get_value("cpu_speedo"))
-        with dpg.tab(label="GPU"):
+            dpg.add_button(label="Save kip", callback=k.write_kip)
+            dpg.add_separator(label="Downloads")
+            dpg.add_button(label="Install OCS2 Loader", callback=ins.downloadLoader)
+            dpg.add_button(label="Install OCS2 sys-clk", callback=ins.downloadSysClk)
+            dpg.add_separator(label="Advanced")
+            dpg.add_button(label="Manually Select kip", callback=lambda: dpg.show_item("file_dialog"))
+        with dpg.tab(label="GPU", tag="gpu_tab"):
             gpu.populate()
-        with dpg.tab(label="CPU"):
+
+        with dpg.tab(label="CPU", tag="cpu_tab"):
             cpu.populate()
-        with dpg.tab(label="RAM"):
+
+        with dpg.tab(label="RAM", tag="emc_tab"):
             ram.populate()
 
+        with dpg.tab(label="About", tag="about_tab"):
+            about.populate()
+
+        dpg.hide_item("gpu_tab")
+        dpg.hide_item("cpu_tab")
+        dpg.hide_item("emc_tab")
+
 dpg.bind_font(lexend)
+
 dpg.create_viewport(title="OCS2 Configuration", width=854, height=480)
-dpg.setup_dearpygui()
 dpg.set_viewport_large_icon(assets_path + "icon.ico")
-dpg.show_viewport()
 dpg.set_viewport_title("OCS2 Configurator")
 dpg.set_primary_window("main_window", True)
+
+dpg.setup_dearpygui()
+dpg.show_viewport()
+
 dpg.start_dearpygui()
+
 dpg.destroy_context()

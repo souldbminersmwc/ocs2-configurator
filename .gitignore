@@ -1,0 +1,6 @@
+
+### Ocs2 Config ###
+build/
+dist/
+src/__pycache__
+*.kip

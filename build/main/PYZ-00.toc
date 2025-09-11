@@ -283,6 +283,9 @@
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.2032.0_x64__qbz5n2kfra8p0\\Lib\\_threading_local.py',
    'PYMODULE'),
+  ('about',
+   'C:\\Users\\sould\\Documents\\GitHub\\ocs2-configurator\\src\\about.py',
+   'PYMODULE'),
   ('argparse',
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.2032.0_x64__qbz5n2kfra8p0\\Lib\\argparse.py',
@@ -502,6 +505,10 @@
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.2032.0_x64__qbz5n2kfra8p0\\Lib\\concurrent\\futures\\thread.py',
    'PYMODULE'),
+  ('configparser',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.2032.0_x64__qbz5n2kfra8p0\\Lib\\configparser.py',
+   'PYMODULE'),
   ('contextlib',
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.2032.0_x64__qbz5n2kfra8p0\\Lib\\contextlib.py',
@@ -574,6 +581,9 @@
   ('decimal',
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.2032.0_x64__qbz5n2kfra8p0\\Lib\\decimal.py',
+   'PYMODULE'),
+  ('defaults',
+   'C:\\Users\\sould\\Documents\\GitHub\\ocs2-configurator\\src\\defaults.py',
    'PYMODULE'),
   ('difflib',
    'C:\\Program '
@@ -830,6 +840,9 @@
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.2032.0_x64__qbz5n2kfra8p0\\Lib\\inspect.py',
    'PYMODULE'),
+  ('installer',
+   'C:\\Users\\sould\\Documents\\GitHub\\ocs2-configurator\\src\\installer.py',
+   'PYMODULE'),
   ('ipaddress',
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.2032.0_x64__qbz5n2kfra8p0\\Lib\\ipaddress.py',
@@ -849,6 +862,12 @@
   ('json.scanner',
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.2032.0_x64__qbz5n2kfra8p0\\Lib\\json\\scanner.py',
+   'PYMODULE'),
+  ('kip',
+   'C:\\Users\\sould\\Documents\\GitHub\\ocs2-configurator\\src\\kip.py',
+   'PYMODULE'),
+  ('license',
+   'C:\\Users\\sould\\Documents\\GitHub\\ocs2-configurator\\src\\license.py',
    'PYMODULE'),
   ('logging',
    'C:\\Program '
@@ -1412,6 +1431,9 @@
   ('pprint',
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_3.13.2032.0_x64__qbz5n2kfra8p0\\Lib\\pprint.py',
+   'PYMODULE'),
+  ('preset',
+   'C:\\Users\\sould\\Documents\\GitHub\\ocs2-configurator\\src\\preset.py',
    'PYMODULE'),
   ('psutil',
    'C:\\Users\\sould\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python313\\site-packages\\psutil\\__init__.py',
