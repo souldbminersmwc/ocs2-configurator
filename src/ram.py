@@ -56,13 +56,13 @@ def populate():
     dvb = [i for i in range(10)]
     dpg.add_separator(label="RAM Types")
     dpg.add_combo(
-        items=["Samsung AA-MGCL/MGCR", "SK Hynix NEI/NEE", "SK Hynix H54 / x267", "Micron WT:B", "Micron AUT:B", "Micron WT:F", "Samsung AM-MGCJ", "Micron WT:E", "Samsung AB-MGCL / 1z", "Hynix NME", "Samsung HB-MGCH"],
+        items=["Samsung AA-MGCL/MGCR", "SK Hynix NEI/NEE", "SK Hynix x267", "Micron WT:B", "Micron AUT:B", "Micron WT:F", "Samsung AM-MGCJ", "Micron WT:E", "Samsung AB-MGCL", "Hynix NME", "Samsung HB-MGCH"],
         default_value="Choose your RAM Type!",
         label="RAM Type",
         tag="ram_type"
     )
-    dpg.add_button(label="Apply Regular Preset", callback=preset.temporary_presets_unavailable)
-    dpg.add_button(label="Apply Tight Preset", callback=preset.temporary_presets_unavailable)
+    dpg.add_button(label="Apply Regular Preset", callback=preset.apply_reg_timings)
+    dpg.add_button(label="Apply Tight Preset", callback=preset.apply_st_timings)
     dpg.add_button(label="Load Default Preset", callback=preset.load_defaults)
     dpg.add_separator(label="Frequencies")
 
@@ -105,7 +105,7 @@ def populate():
         tag="m_emc_dvb"
     )
 
-    dpg.add_separator(label="Timings")
+    dpg.add_separator(label="Primary Timings")
     dpg.add_combo(
         items=["0", "1", "2"],
         default_value="0",
@@ -120,18 +120,21 @@ def populate():
         callback=k.grab_kip_storage_values_no_mult,
         tag="m_emc_latency"
     )
-    dpg.add_combo(
-        items=["16", "32"],
-        default_value="16",
-        label="tBL",
-        callback=k.grab_kip_storage_values_no_mult,
-        tag="tBL"
-    )
+    dpg.add_input_int(label="tRCD", tag="tRCD", callback=k.grab_kip_storage_values_no_mult)
+
+    dpg.add_input_int(label="tRAS", tag="tRAS", callback=k.grab_kip_storage_values_no_mult)
+    dpg.add_input_float(label="tRRD", tag="tRRD", callback=k.grab_kip_storage_values_no_mult)
+    dpg.add_input_int(label="tFAW", tag="tFAW", callback=k.grab_kip_storage_values_no_mult)
+    dpg.add_input_int(label="tWR", tag="tWR", callback=k.grab_kip_storage_values_no_mult)
+    dpg.add_input_int(label="tWTR", tag="tWTR", callback=k.grab_kip_storage_values_no_mult)
     dpg.add_input_int(label="tRFCpb", tag="tRFCpb", callback=k.grab_kip_storage_values_no_mult)
     dpg.add_input_int(label="tRFCab", tag="tRFCab", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_int(label="tRAS", tag="tRAS", callback=k.grab_kip_storage_values_no_mult)
     dpg.add_input_int(label="tRPpb", tag="tRPpb", callback=k.grab_kip_storage_values_no_mult)
     dpg.add_input_int(label="tRPab", tag="tRPab", callback=k.grab_kip_storage_values_no_mult)
+    dpg.add_input_int(label="tREFpb", tag="tREFpb", callback=k.grab_kip_storage_values_no_mult)
+
+    dpg.add_separator(label="Secondary Timings")
+
     dpg.add_input_int(label="tRC", tag="tRC", callback=k.grab_kip_storage_values_no_mult)
     dpg.add_input_float(label="tDQSCK_min", tag="tDQSCK_min", callback=k.grab_kip_storage_values_no_mult)
     dpg.add_input_float(label="tDQSCK_max", tag="tDQSCK_max", callback=k.grab_kip_storage_values_no_mult)
@@ -140,13 +143,8 @@ def populate():
     dpg.add_input_float(label="tDQSS_max", tag="tDQSS_max", callback=k.grab_kip_storage_values_no_mult)
     dpg.add_input_float(label="tDQS2DQ_max", tag="tDQS2DQ_max", callback=k.grab_kip_storage_values_no_mult)
     dpg.add_input_float(label="tDQSQ", tag="tDQSQ", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_int(label="tWTR", tag="tWTR", callback=k.grab_kip_storage_values_no_mult)
     dpg.add_input_float(label="tRTP", tag="tRTP", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_int(label="tWR", tag="tWR", callback=k.grab_kip_storage_values_no_mult)
     dpg.add_input_int(label="tR2REF", tag="tR2REF", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_int(label="tRCD", tag="tRCD", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_float(label="tRRD", tag="tRRD", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_int(label="tREFpb", tag="tREFpb", callback=k.grab_kip_storage_values_no_mult)
     dpg.add_input_float(label="tXP", tag="tXP", callback=k.grab_kip_storage_values_no_mult)
     dpg.add_input_float(label="tCMDCKE", tag="tCMDCKE", callback=k.grab_kip_storage_values_no_mult)
     dpg.add_input_int(label="tMRWCKEL", tag="tMRWCKEL", callback=k.grab_kip_storage_values_no_mult)
@@ -155,5 +153,11 @@ def populate():
     dpg.add_input_float(label="tXSR", tag="tXSR", callback=k.grab_kip_storage_values_no_mult)
     dpg.add_input_float(label="tCKE", tag="tCKE", callback=k.grab_kip_storage_values_no_mult)
     dpg.add_input_int(label="tSR", tag="tSR", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_int(label="tFAW", tag="tFAW", callback=k.grab_kip_storage_values_no_mult)
     dpg.add_input_float(label="tCKCKEH", tag="tCKCKEH", callback=k.grab_kip_storage_values_no_mult)
+    dpg.add_combo(
+        items=["16", "32"],
+        default_value="16",
+        label="tBL",
+        callback=k.grab_kip_storage_values_no_mult,
+        tag="tBL"
+    )

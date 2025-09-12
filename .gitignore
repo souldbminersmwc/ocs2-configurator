@@ -1,6 +1,34 @@
 
 ### Ocs2 Config ###
+__pycache__/
+*.py[cod]
+*$py.class
+*.kip
+# PyInstaller build folders
 build/
 dist/
-src/__pycache__
-*.kip
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+*.exe
+*.dll
+
+# IDEs
+.vscode/
+.idea/
+*.iml
