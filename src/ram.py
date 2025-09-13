@@ -144,7 +144,7 @@ def populate():
     dpg.add_input_float(label="tDQS2DQ_max", tag="tDQS2DQ_max", callback=k.grab_kip_storage_values_no_mult)
     dpg.add_input_float(label="tDQSQ", tag="tDQSQ", callback=k.grab_kip_storage_values_no_mult)
     dpg.add_input_float(label="tRTP", tag="tRTP", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_int(label="tR2REF", tag="tR2REF", callback=k.grab_kip_storage_values_no_mult)
+    dpg.add_input_float(label="tR2REF", tag="tR2REF", callback=k.grab_kip_storage_values_no_mult)
     dpg.add_input_float(label="tXP", tag="tXP", callback=k.grab_kip_storage_values_no_mult)
     dpg.add_input_float(label="tCMDCKE", tag="tCMDCKE", callback=k.grab_kip_storage_values_no_mult)
     dpg.add_input_int(label="tMRWCKEL", tag="tMRWCKEL", callback=k.grab_kip_storage_values_no_mult)

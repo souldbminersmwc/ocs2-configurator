@@ -73,7 +73,6 @@ variables = [
     ("tRC", "u32"),
     ("tWTR", "u32"),
     ("tWR", "u32"),
-    ("tR2REF", "u32"),
     ("tRCD", "u32"),
     ("tREFpb", "u32"),
     ("tMRWCKEL", "u32"),
@@ -81,6 +80,7 @@ variables = [
     ("tFAW", "u32"),
 
     # RAM timings (double)
+    ("tR2REF", "double"),
     ("tDQSCK_min", "double"),
     ("tDQSCK_max", "double"),
     ("tWPRE", "double"),
@@ -98,7 +98,7 @@ variables = [
     ("tCKE", "double"),
     ("tCKCKEH", "double"),
 
-    # Mariko GPU voltages (keep individually)
+    # Mariko GPU voltages
     ("g_volt_76800", "u32"),
     ("g_volt_153600", "u32"),
     ("g_volt_230400", "u32"),
@@ -238,9 +238,9 @@ def grab_kip_storage_values(sender, app_data):
     if tag and hasattr(d, tag):
         numeric_str = app_data.split(" ")[0]
         value = int(float(numeric_str) * 1000)
-        setattr(d, tag, value)  # store only numeric value
+        setattr(d, tag, value)
     
-    print(tag, app_data, getattr(d, tag))  # shows numeric value
+    print(tag, app_data, getattr(d, tag))
     if(d.autosave == True):
         write_kip()
 
@@ -252,9 +252,9 @@ def grab_kip_storage_values_no_mult(sender, app_data):
             numeric_str = re.sub(r"[^0-9.]", "", app_data)
             value = numeric_str
         value = app_data
-        setattr(d, tag, value)  # store only numeric value
+        setattr(d, tag, value)
     
-    print(tag, app_data, getattr(d, tag))  # shows numeric value
+    print(tag, app_data, getattr(d, tag))
     if(d.autosave == True):
         write_kip()
 
@@ -272,7 +272,7 @@ def write_kip():
 
     type_map = {
         "u32": ("<I", 4, lambda v: int(v) & 0xFFFFFFFF),
-        "double": ("<d", 8, lambda v: float(v)),  # ensure float
+        "double": ("<d", 8, lambda v: float(v)),
     }
 
     if kip_file_path is None:
@@ -299,10 +299,8 @@ def write_kip():
             fmt, size, convert = type_map[t]
             f.seek(pos)
 
-            # Get the actual value from the d module
             value = getattr(d, attr_name)
 
-            # Convert string input to correct numeric type
             try:
                 packed_value = struct.pack(fmt, convert(value))
             except (ValueError, TypeError):

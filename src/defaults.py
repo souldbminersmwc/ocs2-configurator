@@ -60,7 +60,7 @@ class Defaults:
         self.tWTR = 10
         self.tRTP = 7.5
         self.tWR = 18
-        self.tR2REF = 26
+        self.tR2REF = 25
         self.tRCD = 18
         self.tRRD = 10.0
         self.tREFpb = 488
