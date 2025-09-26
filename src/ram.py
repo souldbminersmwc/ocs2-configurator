@@ -58,7 +58,7 @@ def populate():
     dvb = [i for i in range(10)]
     dpg.add_separator(label="RAM Types")
     dpg.add_combo(
-        items=["Samsung AA-MGCL/MGCR", "SK Hynix NEI/NEE", "SK Hynix x267", "Micron WT:B", "Micron AUT:B", "Micron WT:F", "Samsung AM-MGCJ", "Micron WT:E", "Samsung AB-MGCL", "Hynix NME", "Samsung HB-MGCH"],
+        items=["Samsung AA-MGCL/MGCR", "SK Hynix NEI/NEE/x267", "Micron WT:B", "Micron AUT:B", "Micron WT:F", "Samsung AM-MGCJ", "Micron WT:E", "Samsung AB-MGCL", "SK Hynix NME", "Samsung HB-MGCH"],
         default_value="Choose your RAM Type!",
         label="RAM Type",
         tag="ram_type"

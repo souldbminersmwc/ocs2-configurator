@@ -21,364 +21,223 @@ import dearpygui.dearpygui as dpg
 from defaults import d
 import common as c
 timing_vars = [
-    "d.tBL",
-    "d.tRFCpb",
-    "d.tRFCab",
-    "d.tRAS",
-    "d.tRPpb",
-    "d.tRPab",
-    "d.tRC",
-    "d.tDQSCK_min",
-    "d.tDQSCK_max",
-    "d.tWPRE",
-    "d.tRPST",
-    "d.tDQSS_max",
-    "d.tDQS2DQ_max",
-    "d.tDQSQ",
-    "d.tWTR",
-    "d.tRTP",
-    "d.tWR",
-    "d.tR2REF",
-    "d.tRCD",
-    "d.tRRD",
-    "d.tREFpb",
-    "d.tXP",
-    "d.tCMDCKE",
-    "d.tMRWCKEL",
-    "d.tCKELCS",
-    "d.tCSCKEH",
-    "d.tXSR",
-    "d.tCKE",
-    "d.tSR",
-    "d.tFAW",
-    "d.tCKCKEH"
+    "d.t1_tRCD",
+    "d.t2_tRP",
+    "d.t3_tRAS",
+    "d.t4_tRRD",
+    "d.t5_tRFC",
+    "d.t6_tRTW",
+    "d.t7_tWTR",
+    "d.t8_tREFI"
 ]
 
 timing_preset_default = [
-    16,   # tBL
-    32,
-    15,
-    140,  # tRFCpb
-    280,  # tRFCab
-    42,   # tRAS
-    18,   # tRPpb
-    21,   # tRPab
-    60,   # tRC
-    1.5,  # tDQSCK_min
-    3.5,  # tDQSCK_max
-    1.8,  # tWPRE
-    0.4,  # tRPST
-    1.25, # tDQSS_max
-    0.8,  # tDQS2DQ_max
-    0.18, # tDQSQ
-    10,   # tWTR
-    7.5,  # tRTP
-    18,   # tWR
-    25.5,   # tR2REF
-    18,   # tRCD
-    10.0, # tRRD
-    488,  # tREFpb
-    10,   # tXP
-    1.75, # tCMDCKE
-    14,   # tMRWCKEL
-    5,    # tCKELCS
-    1.75, # tCSCKEH
-    287.5,# tXSR
-    7.5,  # tCKE
-    15,   # tSR
-    40,   # tFAW
-    1.75  # tCKCKEH
+    0, # tRCD
+    0, # tRP
+    0, # tRAS
+    0, # tRRD
+    0, # tRFC
+    0, # tRTW
+    0, # tWTR
+    0, # tREFI
 ]
 
 timing_preset_aamgcl_c = [
-    # Ignore tRTW, it is autocalculated
-    16,   # tBL
-    32,
-    15,
-    70,  # tRFCpb
-    140,  # tRFCab (tRFCpb * 2)
-    28,   # tRAS
-    14,   # tRPpb
-    17,   # tRPab (tRPpb + 3)
-    60,   # tRC
-    1.5,  # tDQSCK_min
-    3.5,  # tDQSCK_max
-    1.8,  # tWPRE
-    0.4,  # tRPST
-    1.25, # tDQSS_max
-    0.8,  # tDQS2DQ_max
-    0.18, # tDQSQ
-    3,   # tWTR
-    7.5,  # tRTP
-    18,   # tWR
-    25.5,   # tR2REF
-    14,   # tRCD
-    3.0, # tRRD
-    9999,  # tREFpb
-    10,   # tXP
-    1.75, # tCMDCKE
-    14,   # tMRWCKEL
-    5,    # tCKELCS
-    1.75, # tCSCKEH
-    287.5,# tXSR
-    7.5,  # tCKE
-    15,   # tSR
-    40,   # tFAW
-    1.75  # tCKCKEH
+    4, # tRCD
+    4, # tRP
+    5, # tRAS
+    5, # tRRD
+    5, # tRFC
+    5, # tRTW
+    7, # tWTR
+    6, # tREFI
 ]
 
 timing_preset_aamgcl_st = [
-    # Ignore tRTW, it is autocalculated
-    16,   # tBL
-    32,
-    15,
-    70,  # tRFCpb
-    140,  # tRFCab (tRFCpb * 2)
-    22,   # tRAS
-    14,   # tRPpb
-    17,   # tRPab (tRPpb + 3)
-    60,   # tRC
-    1.5,  # tDQSCK_min
-    3.5,  # tDQSCK_max
-    1.8,  # tWPRE
-    0.4,  # tRPST
-    1.25, # tDQSS_max
-    0.8,  # tDQS2DQ_max
-    0.18, # tDQSQ
-    2,   # tWTR
-    7.5,  # tRTP
-    18,   # tWR
-    25.5,   # tR2REF
-    14,   # tRCD
-    2.0, # tRRD
-    9999,  # tREFpb
-    10,   # tXP
-    1.75, # tCMDCKE
-    14,   # tMRWCKEL
-    5,    # tCKELCS
-    1.75, # tCSCKEH
-    287.5,# tXSR
-    7.5,  # tCKE
-    15,   # tSR
-    40,   # tFAW
-    1.75  # tCKCKEH
+    4, # tRCD
+    4, # tRP
+    8, # tRAS
+    6, # tRRD
+    5, # tRFC
+    7, # tRTW
+    8, # tWTR
+    6, # tREFI
 ]
 
 timing_preset_mgcj_c = [
-    16,   # tBL
-    32,
-    15,
-    80,  # tRFCpb
-    160,  # tRFCab
-    30,   # tRAS
-    16,   # tRPpb
-    19,   # tRPab
-    60,   # tRC
-    1.5,  # tDQSCK_min
-    3.5,  # tDQSCK_max
-    1.8,  # tWPRE
-    0.4,  # tRPST
-    1.25, # tDQSS_max
-    0.8,  # tDQS2DQ_max
-    0.18, # tDQSQ
-    6,   # tWTR
-    7.5,  # tRTP
-    18,   # tWR
-    25.5,   # tR2REF
-    15,   # tRCD
-    6.0, # tRRD
-    9999,  # tREFpb
-    10,   # tXP
-    1.75, # tCMDCKE
-    14,   # tMRWCKEL
-    5,    # tCKELCS
-    1.75, # tCSCKEH
-    287.5,# tXSR
-    7.5,  # tCKE
-    15,   # tSR
-    40,   # tFAW
-    1.75  # tCKCKEH
+    3, # tRCD
+    2, # tRP
+    4, # tRAS
+    2, # tRRD
+    4, # tRFC
+    4, # tRTW
+    4, # tWTR
+    6, # tREFI
 ]
 
 timing_preset_mgcj_st = [
-    16,   # tBL
-    32,
-    15,
-    70,  # tRFCpb
-    140,  # tRFCab
-    20,   # tRAS
-    15,   # tRPpb
-    18,   # tRPab
-    60,   # tRC
-    1.5,  # tDQSCK_min
-    3.5,  # tDQSCK_max
-    1.8,  # tWPRE
-    0.4,  # tRPST
-    1.25, # tDQSS_max
-    0.8,  # tDQS2DQ_max
-    0.18, # tDQSQ
-    6,   # tWTR
-    7.5,  # tRTP
-    18,   # tWR
-    25.5,   # tR2REF
-    14,   # tRCD
-    6.0, # tRRD
-    9999,  # tREFpb
-    10,   # tXP
-    1.75, # tCMDCKE
-    14,   # tMRWCKEL
-    5,    # tCKELCS
-    1.75, # tCSCKEH
-    287.5,# tXSR
-    7.5,  # tCKE
-    15,   # tSR
-    40,   # tFAW
-    1.75  # tCKCKEH
+    4, # tRCD
+    3, # tRP
+    8, # tRAS
+    2, # tRRD
+    5, # tRFC
+    4, # tRTW
+    4, # tWTR
+    6, # tREFI
 ]
 
 timing_preset_ab_mgcl_c = [
-    16,   # tBL
-    32,
-    15,
-    80,  # tRFCpb
-    160,  # tRFCab
-    20,   # tRAS
-    14,   # tRPpb
-    17,   # tRPab
-    60,   # tRC
-    1.5,  # tDQSCK_min
-    3.5,  # tDQSCK_max
-    1.8,  # tWPRE
-    0.4,  # tRPST
-    1.25, # tDQSS_max
-    0.8,  # tDQS2DQ_max
-    0.18, # tDQSQ
-    4,   # tWTR
-    7.5,  # tRTP
-    18,   # tWR
-    25.5,   # tR2REF
-    14,   # tRCD
-    4.0, # tRRD
-    9999,  # tREFpb
-    10,   # tXP
-    1.75, # tCMDCKE
-    14,   # tMRWCKEL
-    5,    # tCKELCS
-    1.75, # tCSCKEH
-    287.5,# tXSR
-    7.5,  # tCKE
-    15,   # tSR
-    40,   # tFAW
-    1.75  # tCKCKEH
+    4, # tRCD
+    4, # tRP
+    4, # tRAS
+    4, # tRRD
+    4, # tRFC
+    5, # tRTW
+    6, # tWTR
+    6, # tREFI
 ]
 
 timing_preset_ab_mgcl_st = [
-    16,   # tBL
-    32,
-    15,
-    70,  # tRFCpb
-    140,  # tRFCab
-    22,   # tRAS
-    14,   # tRPpb
-    17,   # tRPab
-    60,   # tRC
-    1.5,  # tDQSCK_min
-    3.5,  # tDQSCK_max
-    1.8,  # tWPRE
-    0.4,  # tRPST
-    1.25, # tDQSS_max
-    0.8,  # tDQS2DQ_max
-    0.18, # tDQSQ
-    2,   # tWTR
-    7.5,  # tRTP
-    18,   # tWR
-    25.5,   # tR2REF
-    14,   # tRCD
-    3.0, # tRRD
-    9999,  # tREFpb
-    10,   # tXP
-    1.75, # tCMDCKE
-    14,   # tMRWCKEL
-    5,    # tCKELCS
-    1.75, # tCSCKEH
-    287.5,# tXSR
-    7.5,  # tCKE
-    15,   # tSR
-    40,   # tFAW
-    1.75  # tCKCKEH
+    4, # tRCD
+    4, # tRP
+    8, # tRAS
+    5, # tRRD
+    5, # tRFC
+    6, # tRTW
+    8, # tWTR
+    6, # tREFI
+]
+timing_preset_hb_mgch_c = [
+    4, # tRCD
+    4, # tRP
+    4, # tRAS
+    0, # tRRD
+    1, # tRFC
+    5, # tRTW
+    4, # tWTR
+    6, # tREFI
+]
+timing_preset_hb_mgch_st = [
+    4, # tRCD
+    5, # tRP
+    9, # tRAS
+    1, # tRRD
+    2, # tRFC
+    6, # tRTW
+    4, # tWTR
+    6, # tREFI
+]
+
+timing_preset_wtf_c = [
+    4, # tRCD
+    4, # tRP
+    2, # tRAS
+    5, # tRRD
+    4, # tRFC
+    6, # tRTW
+    3, # tWTR
+    6, # tREFI
+]
+
+timing_preset_wtf_st = [
+    5, # tRCD
+    5, # tRP
+    4, # tRAS
+    5, # tRRD
+    5, # tRFC
+    6, # tRTW
+    5, # tWTR
+    6, # tREFI
+]
+
+timing_preset_wte_c = [
+    2, # tRCD
+    2, # tRP
+    2, # tRAS
+    2, # tRRD
+    4, # tRFC
+    4, # tRTW
+    4, # tWTR
+    6, # tREFI
+]
+
+timing_preset_wte_st = [
+    3, # tRCD
+    5, # tRP
+    3, # tRAS
+    3, # tRRD
+    5, # tRFC
+    4, # tRTW
+    5, # tWTR
+    6, # tREFI
 ]
 
 timing_preset_wtb_c = [
-    16,   # tBL
-    32,
-    15,
-    100,  # tRFCpb
-    200,  # tRFCab
-    28,   # tRAS
-    14,   # tRPpb
-    17,   # tRPab
-    60,   # tRC
-    1.5,  # tDQSCK_min
-    3.5,  # tDQSCK_max
-    1.8,  # tWPRE
-    0.4,  # tRPST
-    1.25, # tDQSS_max
-    0.8,  # tDQS2DQ_max
-    0.18, # tDQSQ
-    5,   # tWTR
-    7.5,  # tRTP
-    18,   # tWR
-    25.5,   # tR2REF
-    14,   # tRCD
-    3.0, # tRRD
-    9999,  # tREFpb
-    10,   # tXP
-    1.75, # tCMDCKE
-    14,   # tMRWCKEL
-    5,    # tCKELCS
-    1.75, # tCSCKEH
-    287.5,# tXSR
-    7.5,  # tCKE
-    15,   # tSR
-    40,   # tFAW
-    1.75  # tCKCKEH
+    4, # tRCD
+    4, # tRP
+    5, # tRAS
+    5, # tRRD
+    2, # tRFC
+    6, # tRTW
+    5, # tWTR
+    6, # tREFI
 ]
 
 timing_preset_wtb_st = [
-    16,   # tBL
-    32,
-    15,
-    100,  # tRFCpb
-    200,  # tRFCab
-    24,   # tRAS
-    12,   # tRPpb
-    15,   # tRPab
-    60,   # tRC
-    1.5,  # tDQSCK_min
-    3.5,  # tDQSCK_max
-    1.8,  # tWPRE
-    0.4,  # tRPST
-    1.25, # tDQSS_max
-    0.8,  # tDQS2DQ_max
-    0.18, # tDQSQ
-    5,   # tWTR
-    7.5,  # tRTP
-    18,   # tWR
-    25.5,   # tR2REF
-    12,   # tRCD
-    1.0, # tRRD
-    9999,  # tREFpb
-    10,   # tXP
-    1.75, # tCMDCKE
-    14,   # tMRWCKEL
-    5,    # tCKELCS
-    1.75, # tCSCKEH
-    287.5,# tXSR
-    7.5,  # tCKE
-    15,   # tSR
-    40,   # tFAW
-    1.75  # tCKCKEH
+    6, # tRCD
+    6, # tRP
+    7, # tRAS
+    7, # tRRD
+    2, # tRFC
+    6, # tRTW
+    5, # tWTR
+    6, # tREFI
 ]
+
+timing_preset_nee_c = [
+    3, # tRCD
+    3, # tRP
+    2, # tRAS
+    2, # tRRD
+    5, # tRFC
+    5, # tRTW
+    4, # tWTR
+    6, # tREFI
+]
+
+timing_preset_nee_st = [
+    4, # tRCD
+    4, # tRP
+    4, # tRAS
+    3, # tRRD
+    7, # tRFC
+    6, # tRTW
+    5, # tWTR
+    6, # tREFI
+]
+
+timing_preset_nme_c = [
+    2, # tRCD
+    2, # tRP
+    1, # tRAS
+    0, # tRRD
+    1, # tRFC
+    4, # tRTW
+    3, # tWTR
+    6, # tREFI
+]
+
+timing_preset_nme_st = [
+    3, # tRCD
+    3, # tRP
+    4, # tRAS
+    0, # tRRD
+    1, # tRFC
+    4, # tRTW
+    4, # tWTR
+    6, # tREFI
+]
+
 
 def load_defaults():
     apply_timing_preset(timing_preset_default)
@@ -407,12 +266,24 @@ def apply_reg_timings(sender, app_data):
             c.show_popup("Error", "You must select a ram type to apply a preset")
         case "Samsung AA-MGCL/MGCR":
             apply_timing_preset(timing_preset_aamgcl_c)
-        case "Samsung AM-MGCJ":
-            apply_timing_preset(timing_preset_mgcj_c)
-        case "Samsung AB-MGCL":
-            apply_timing_preset(timing_preset_ab_mgcl_c)
+        case "SK Hynix NEI/NEE/x267":
+            apply_timing_preset(timing_preset_nee_c)
         case "Micron WT:B":
             apply_timing_preset(timing_preset_wtb_c)
+        case "Micron AUT:B":
+            apply_timing_preset(timing_preset_wtb_c)
+        case "Micron WT:F":
+            apply_timing_preset(timing_preset_wtf_c)
+        case "Samsung AM-MGCJ":
+            apply_timing_preset(timing_preset_mgcj_c)
+        case "Micron WT:E":
+            apply_timing_preset(timing_preset_wte_c)
+        case "Samsung AB-MGCL":
+            apply_timing_preset(timing_preset_ab_mgcl_c)
+        case "SK Hynix NME":
+            apply_timing_preset(timing_preset_nme_c)
+        case "Samsung HB-MGCH":
+            apply_timing_preset(timing_preset_hb_mgch_c)
         case _:
             temporary_presets_unavailable()
 
@@ -423,12 +294,24 @@ def apply_st_timings(sender, app_data):
             c.show_popup("Error", "You must select a ram type to apply a preset")
         case "Samsung AA-MGCL/MGCR":
             apply_timing_preset(timing_preset_aamgcl_st)
-        case "Samsung AM-MGCJ":
-            apply_timing_preset(timing_preset_mgcj_st)
-        case "Samsung AB-MGCL":
-            apply_timing_preset(timing_preset_ab_mgcl_st)
+        case "SK Hynix NEI/NEE/x267":
+            apply_timing_preset(timing_preset_nee_st)
         case "Micron WT:B":
             apply_timing_preset(timing_preset_wtb_st)
+        case "Micron AUT:B":
+            apply_timing_preset(timing_preset_wtb_st)
+        case "Micron WT:F":
+            apply_timing_preset(timing_preset_wtf_st)
+        case "Samsung AM-MGCJ":
+            apply_timing_preset(timing_preset_mgcj_st)
+        case "Micron WT:E":
+            apply_timing_preset(timing_preset_wte_st)
+        case "Samsung AB-MGCL":
+            apply_timing_preset(timing_preset_ab_mgcl_st)
+        case "SK Hynix NME":
+            apply_timing_preset(timing_preset_nme_st)
+        case "Samsung HB-MGCH":
+            apply_timing_preset(timing_preset_hb_mgch_st)
         case _:
             temporary_presets_unavailable()
 
