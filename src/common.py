@@ -1,7 +1,7 @@
 
 """
 
-OCS2 Configurator
+HOC Configurator
 
 Copyright (C) Souldbminer
 

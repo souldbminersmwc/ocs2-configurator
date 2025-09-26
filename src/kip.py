@@ -1,104 +1,47 @@
-
-"""
-
-OCS2 Configurator
-
-Copyright (C) Souldbminer
-
-This program is free software; you can redistribute it and/or modify it
-under the terms and conditions of the GNU General Public License,
-version 2, as published by the Free Software Foundation.
-
-This program is distributed in the hope that it will be useful, but WITHOUT
-ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-"""
-
-
 import dearpygui.dearpygui as dpg
 import struct
 from defaults import d
 import common as c
 import gpu as g
 import cpu
-import struct
 import defaults as df
 import re
-global g_freq_str
-kip_file_path=None
+import ctypes
 
-# This is grouped together as in the binary C/C++ pad doubles to align to memory banks.
+g_freq_str = None
+kip_file_path = None
+
 variables = [
-    # Common
-    ("custrev", "u32"),
+    ("custRev", "u32"),
     ("mtcConf", "u32"),
     ("commonCpuBoostClock", "u32"),
     ("commonEmcMemVolt", "u32"),
-
-    # Erista
     ("eristaCpuMaxVolt", "u32"),
     ("eristaEmcMaxClock", "u32"),
-
-    # Mariko
     ("marikoCpuMaxVolt", "u32"),
     ("marikoEmcMaxClock", "u32"),
     ("marikoEmcVddqVolt", "u32"),
     ("marikoCpuUV", "u32"),
     ("marikoGpuUV", "u32"),
+    ("eristaCpuUV", "u32"),
+    ("eristaGpuUV", "u32"),
+    ("enableMarikoGpuUnsafeFreqs", "u32"),
+    ("enableEristaGpuUnsafeFreqs", "u32"),
+    ("enableMarikoCpuUnsafeFreqs", "u32"),
+    ("enableEristaCpuUnsafeFreqs", "u32"),
     ("commonGpuVoltOffset", "u32"),
-    ("marikoCpuHighVoltOffset", "u32"),
-    ("marikoCpuHighUV", "u32"),
-
-    # CPU/GPU
-    ("cpuMaxFreq", "u32"),
-    ("gpuMaxFreq", "u32"),
-    ("gpuVmax", "u32"),
-    ("gpuVmin", "u32"),
-
     ("marikoEmcDvbShift", "u32"),
+    # advanced config
+    ("t1_tRCD", "u32"),
+    ("t2_tRP", "u32"),
+    ("t3_tRAS", "u32"),
+    ("t4_tRRD", "u32"),
+    ("t5_tRFC", "u32"),
+    ("t6_tRTW", "u32"),
+    ("t7_tWTR", "u32"),
+    ("t8_tREFI", "u32"),
+    ("mem_burst_latency", "u32"),
 
-    # RAM timings (u32)
-    ("latency", "u32"),
-    ("BL", "u32"),
-    ("tRFCpb", "u32"),
-    ("tRFCab", "u32"),
-    ("tRAS", "u32"),
-    ("tRPpb", "u32"),
-    ("tRPab", "u32"),
-    ("tRC", "u32"),
-    ("tWTR", "u32"),
-    ("tWR", "u32"),
-    ("tRCD", "u32"),
-    ("tREFpb", "u32"),
-    ("tMRWCKEL", "u32"),
-    ("tSR", "u32"),
-    ("tFAW", "u32"),
-
-    # RAM timings (double)
-    ("tR2REF", "double"),
-    ("tDQSCK_min", "double"),
-    ("tDQSCK_max", "double"),
-    ("tWPRE", "double"),
-    ("tRPST", "double"),
-    ("tDQSS_max", "double"),
-    ("tDQS2DQ_max", "double"),
-    ("tDQSQ", "double"),
-    ("tRTP", "double"),
-    ("tRRD", "double"),
-    ("tXP", "double"),
-    ("tCMDCKE", "double"),
-    ("tCKELCS", "double"),
-    ("tCSCKEH", "double"),
-    ("tXSR", "double"),
-    ("tCKE", "double"),
-    ("tCKCKEH", "double"),
-
-    # Mariko GPU voltages
     ("g_volt_76800", "u32"),
     ("g_volt_153600", "u32"),
     ("g_volt_230400", "u32"),
@@ -123,99 +66,85 @@ variables = [
     ("g_volt_1459200", "u32"),
     ("g_volt_1497600", "u32"),
     ("g_volt_1536000", "u32"),
+
+    
+    ("g_volt_e_76800", "u32"),
+    ("g_volt_e_153600", "u32"),
+    ("g_volt_e_230400", "u32"),
+    ("g_volt_e_307200", "u32"),
+    ("g_volt_e_384000", "u32"),
+    ("g_volt_e_460800", "u32"),
+    ("g_volt_e_537600", "u32"),
+    ("g_volt_e_614400", "u32"),
+    ("g_volt_e_691200", "u32"),
+    ("g_volt_e_768000", "u32"),
+    ("g_volt_e_844800", "u32"),
+    ("g_volt_e_921600", "u32"),
+    ("g_volt_e_998400", "u32"),
+    ("g_volt_e_1075200", "u32"),
+    ("g_volt_e_1152000", "u32"),
 ]
 
+fmt_map = {
+    "u32": "I",
+    "double": "d",
+}
+
+def make_struct_format(vars_list):
+    fmt = "="
+    for name, t in vars_list:
+        fmt += fmt_map[t]
+        if name == "tFAW":
+            fmt += "4x"  # i hate hardcoding but this is what it is
+    return fmt
 
 def load_all_vars():
-    # common
-    c.load_entry_object("custrev", 0)
-    c.load_entry_object("mtc", 0)
-    c.load_entry_object("boost", 1)
-    c.load_entry_object("emc_volt", 2)
+    c.load_entry_object("custRev", 0)
+    c.load_entry_object("mtcConf", 0)
+    c.load_entry_object("commonCpuBoostClock", 1)
+    c.load_entry_object("commonEmcMemVolt", 2)
+    c.load_entry_object("eristaCpuMaxVolt", 3)
+    c.load_entry_object("eristaEmcMaxClock", 1)
+    c.load_entry_object("marikoCpuMaxVolt", 3)
+    c.load_entry_object("marikoEmcMaxClock", 1)
+    c.load_entry_object("marikoEmcVddqVolt", 2)
+    c.load_entry_object("marikoCpuUV", 5)
+    c.load_entry_object("marikoGpuUV", 4)
+    c.load_entry_object("eristaCpuUV", 5)
+    c.load_entry_object("eristaGpuUV", 4)
+    c.load_entry_object("enableMarikoGpuUnsafeFreqs", 0)
+    c.load_entry_object("enableEristaGpuUnsafeFreqs", 0)
+    c.load_entry_object("enableMarikoCpuUnsafeFreqs", 0)
+    c.load_entry_object("enableEristaCpuUnsafeFreqs", 0)
+    c.load_entry_object("commonGpuVoltOffset", 3)
+    c.load_entry_object("marikoEmcDvbShift", 0)
 
-    # erista
-    c.load_entry_object("e_c_max_volt", 3)
-    c.load_entry_object("e_emc_max_clock", 1)
+    # Advanced memory config
+    c.load_entry_object("t1_tRCD", 5)
+    c.load_entry_object("t2_tRP", 5)
+    c.load_entry_object("t3_tRAS", 5)
+    c.load_entry_object("t4_tRRD", 5)
+    c.load_entry_object("t5_tRFC", 5)
+    c.load_entry_object("t6_tRTW", 5)
+    c.load_entry_object("t7_tWTR", 5)
+    c.load_entry_object("t8_tREFI", 5)
+    c.load_entry_object("mem_burst_latency", 5)
+    # GPU voltage arrays
+    for freq in [
+        "76800", "153600", "230400", "307200", "384000", "460800", "537600",
+        "614400", "691200", "768000", "844800", "921600", "998400", "1075200",
+        "1152000", "1228800", "1267200", "1305600", "1344000", "1382400",
+        "1420800", "1459200", "1497600", "1536000"
+    ]:
+        c.load_entry_object(f"g_volt_{freq}", 3)
 
-    # mariko
-    c.load_entry_object("m_cpu_max_volt", 3)
-    c.load_entry_object("m_emc_max_clock", 1)
-    c.load_entry_object("m_emc_vddq", 2)
-    c.load_entry_object("m_cpu_uv", 4)
-    c.load_entry_object("m_gpu_uv", 4)
-    c.load_entry_object("m_gpu_offset", 3)
-    c.load_entry_object("m_cpu_hv_offset", 3)
-    c.load_entry_object("m_cpu_huv", 0)
+    for e_freq in [
+        "76800", "153600", "230400", "307200", "384000", "460800", "537600",
+        "614400", "691200", "768000", "844800", "921600", "998400", "1075200",
+        "1152000"
+    ]:
+        c.load_entry_object(f"g_volt_e_{e_freq}", 3)
 
-    # CPU/GPU
-    c.load_entry_object("cpu_max_freq", 1)
-    c.load_entry_object("gpu_max_freq", 1)
-    c.load_entry_object("g_vmax", 3)
-    c.load_entry_object("g_vmin", 3)
-    c.load_entry_object("m_emc_dvb", 0)
-    c.load_entry_object("m_emc_latency", 0)
-
-    # ram timings u32
-    c.load_entry_object("tBL", 5)
-    c.load_entry_object("tRFCpb", 5)
-    c.load_entry_object("tRFCab", 5)
-    c.load_entry_object("tRAS", 5)
-    c.load_entry_object("tRPpb", 5)
-    c.load_entry_object("tRPab", 5)
-    c.load_entry_object("tRC", 5)
-    c.load_entry_object("tWTR", 5)
-    c.load_entry_object("tWR", 5)
-    c.load_entry_object("tR2REF", 5)
-    c.load_entry_object("tRCD", 5)
-    c.load_entry_object("tREFpb", 5)
-    c.load_entry_object("tMRWCKEL", 5)
-    c.load_entry_object("tSR", 5)
-    c.load_entry_object("tFAW", 5)
-
-    # ram timings double
-    c.load_entry_object("tDQSCK_min", 5)
-    c.load_entry_object("tDQSCK_max", 5)
-    c.load_entry_object("tWPRE", 5)
-    c.load_entry_object("tRPST", 5)
-    c.load_entry_object("tDQSS_max", 5)
-    c.load_entry_object("tDQS2DQ_max", 5)
-    c.load_entry_object("tDQSQ", 5)
-    c.load_entry_object("tRTP", 5)
-    c.load_entry_object("tRRD", 5)
-    c.load_entry_object("tXP", 5)
-    c.load_entry_object("tCMDCKE", 5)
-    c.load_entry_object("tCKELCS", 5)
-    c.load_entry_object("tCSCKEH", 5)
-    c.load_entry_object("tXSR", 5)
-    c.load_entry_object("tCKE", 5)
-    c.load_entry_object("tCKCKEH", 5)
-
-    # GPU volt array
-    c.load_entry_object("g_volt_76800", 3)
-    c.load_entry_object("g_volt_153600", 3)
-    c.load_entry_object("g_volt_230400", 3)
-    c.load_entry_object("g_volt_307200", 3)
-    c.load_entry_object("g_volt_384000", 3)
-    c.load_entry_object("g_volt_460800", 3)
-    c.load_entry_object("g_volt_537600", 3)
-    c.load_entry_object("g_volt_614400", 3)
-    c.load_entry_object("g_volt_691200", 3)
-    c.load_entry_object("g_volt_768000", 3)
-    c.load_entry_object("g_volt_844800", 3)
-    c.load_entry_object("g_volt_921600", 3)
-    c.load_entry_object("g_volt_998400", 3)
-    c.load_entry_object("g_volt_1075200", 3)
-    c.load_entry_object("g_volt_1152000", 3)
-    c.load_entry_object("g_volt_1228800", 3)
-    c.load_entry_object("g_volt_1267200", 3)
-    c.load_entry_object("g_volt_1305600", 3)
-    c.load_entry_object("g_volt_1344000", 3)
-    c.load_entry_object("g_volt_1382400", 3)
-    c.load_entry_object("g_volt_1420800", 3)
-    c.load_entry_object("g_volt_1459200", 3)
-    c.load_entry_object("g_volt_1497600", 3)
-    c.load_entry_object("g_volt_1536000", 3)
-    
 def freq_to_label(freq):
     if freq > 1382400:
         return f"{freq / 1000:.1f} MHz (DANGEROUS)"
@@ -223,130 +152,123 @@ def freq_to_label(freq):
         return f"{freq / 1000:.1f} MHz (UNSAFE)"
     else:
         return f"{freq / 1000:.1f} MHz"
-    
+
 def store(sender, app_data):
     global kip_file_path
-    kip_file_path=app_data['file_path_name']
+    kip_file_path = app_data['file_path_name']
     print("Selected" + kip_file_path)
     read_kip(kip_file_path)
     load_all_vars()
 
-
-        
 def grab_kip_storage_values(sender, app_data):
-    tag = dpg.get_item_alias(sender) 
+    tag = dpg.get_item_alias(sender)
     if tag and hasattr(d, tag):
-        numeric_str = app_data.split(" ")[0]
-        value = int(float(numeric_str) * 1000)
+        numeric_str = str(app_data).split(" ")[0]
+        try:
+            value = int(float(numeric_str) * 1000)
+        except (ValueError, TypeError):
+            c.show_popup("Error", f"Invalid numeric value for {tag}: {app_data}")
+            return
         setattr(d, tag, value)
-    
     print(tag, app_data, getattr(d, tag))
-    if(d.autosave == True):
+    if d.autosave:
         write_kip()
-
 
 def grab_kip_storage_values_no_mult(sender, app_data):
-    tag = dpg.get_item_alias(sender) 
-    if tag and hasattr(d, tag):
-        if isinstance(app_data, str):
-            numeric_str = re.sub(r"[^0-9.]", "", app_data)
-            value = numeric_str
+    tag = dpg.get_item_alias(sender)
+    if not tag or not hasattr(d, tag):
+        return
+    if isinstance(app_data, str):
+        numeric_str = re.sub(r"[^0-9.]", "", app_data)
+        if numeric_str == "":
+            c.show_popup("Error", f"Invalid numeric value for {tag}: {app_data}")
+            return
+        try:
+            value = int(float(numeric_str))
+        except (ValueError, TypeError):
+            c.show_popup("Error", f"Invalid numeric value for {tag}: {app_data}")
+            return
+    else:
         value = app_data
-        setattr(d, tag, value)
-    
+    setattr(d, tag, value)
     print(tag, app_data, getattr(d, tag))
-    if(d.autosave == True):
+    if d.autosave:
         write_kip()
 
-
 def grab_value_freq_conversion(sender, app_data):
-    #
     global g_freq_str
     g_freq_str = app_data
-    g_freq_val = int(float(g_freq_str.replace(" MHz", "")) * 1000)
+    try:
+        g_freq_val = int(float(g_freq_str.replace(" MHz", "")) * 1000)
+    except Exception:
+        return
     print(g_freq_val)
 
 def write_kip():
     global kip_file_path
-    MAGIC = b"CUST"  # 0x43 0x55 0x53 0x54
-
-    type_map = {
-        "u32": ("<I", 4, lambda v: int(v) & 0xFFFFFFFF),
-        "double": ("<d", 8, lambda v: float(v)),
-    }
-
+    MAGIC = b"CUST"
+    struct_fmt = make_struct_format(variables)
+    struct_size = struct.calcsize(struct_fmt)
     if kip_file_path is None:
-        if d.autosave:
-            c.show_popup("Error", "You need to select a file to use Autosave!")
-        else:
-            c.show_popup("Error", "You need to select a file to save the KIP!")
+        msg = "You need to select a file to use Autosave!" if d.autosave else "You need to select a file to save the KIP!"
+        c.show_popup("Error", msg)
         return
-
     with open(kip_file_path, "r+b") as f:
         data = f.read()
         idx = data.find(MAGIC)
         if idx == -1:
             c.show_popup("Error", "KIP is invalid!")
             return
-
         pos = idx + len(MAGIC)
-
+        values = []
         for attr_name, t in variables:
-            if t not in type_map:
-                c.show_popup("CodeError", f"Incorrect type for {attr_name} in variables table!")
-                return
-
-            fmt, size, convert = type_map[t]
-            f.seek(pos)
-
-            value = getattr(d, attr_name)
-
-            try:
-                packed_value = struct.pack(fmt, convert(value))
-            except (ValueError, TypeError):
-                c.show_popup("Error", f"Invalid value for {attr_name}: {value}")
-                return
-
-            f.write(packed_value)
-            pos += size
-
+            val = getattr(d, attr_name)
+            if t == "u32":
+                val = int(val) & 0xFFFFFFFF
+            else:
+                val = float(val)
+            values.append(val)
+        try:
+            packed = struct.pack(struct_fmt, *values)
+        except Exception as e:
+            c.show_popup("Error", f"Packing error: {e}")
+            return
+        f.seek(pos)
+        f.write(packed)
     if not d.autosave:
         c.show_popup("Success", "KIP saved successfully!")
 
-
-def read_kip(filename):
+def read_kip(filename, debug=True):
     MAGIC = b"CUST"
-    fmt_map = {
-        "u32": "<I",
-        "double": "<d",
-    }
-
+    struct_fmt = make_struct_format(variables)
+    struct_size = struct.calcsize(struct_fmt)
     with open(filename, "rb") as f:
         data = f.read()
         idx = data.find(MAGIC)
         if idx == -1:
             raise ValueError("magic not found!")
-
         pos = idx + len(MAGIC)
-
-        for attr_name, type_flag in variables:
-            if type_flag not in fmt_map:
-                raise ValueError(f"bad type: {type_flag}")
-
-            fmt = fmt_map[type_flag]
-            size = struct.calcsize(fmt)
-
-            raw_bytes = data[pos:pos + size]
-            value = struct.unpack(fmt, raw_bytes)[0]
-
-            if type_flag == "double":
-                value = float(value)
-            else:
-                value = int(value)
-
-            setattr(d, attr_name, value)
-            pos += size
+        raw = data[pos:pos + struct_size]
+        values = struct.unpack(struct_fmt, raw)
+        for (attr_name, _), val in zip(variables, values):
+            setattr(d, attr_name, val)
+        if debug:
+            print("=== Debug KIP Layout ===")
+            offset = 0
+            for (attr_name, t) in variables:
+                code = fmt_map[t]
+                align = 8 if code == "d" else 4
+                padding = (-offset) % align
+                if padding:
+                    offset += padding
+                size = struct.calcsize(code)
+                raw_bytes = raw[offset:offset + size]
+                val = getattr(d, attr_name)
+                print(f"{attr_name:<20} | type={t:<6} | offset={offset:<4} | size={size:<2} | raw=0x{raw_bytes.hex()} | val={val}")
+                offset += size
+            print("========================")
     dpg.set_value("gpu_sched", g.check_gpu_sched())
     dpg.show_item("gpu_tab")
     dpg.show_item("cpu_tab")
     dpg.show_item("emc_tab")
+    dpg.show_item("misc_tab")

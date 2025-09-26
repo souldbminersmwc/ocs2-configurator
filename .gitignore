@@ -1,9 +1,11 @@
 
-### Ocs2 Config ###
+### HOC Config ###
 __pycache__/
 *.py[cod]
 *$py.class
 *.kip
+*.pyc
+OC_Toolkit/
 # PyInstaller build folders
 build/
 dist/

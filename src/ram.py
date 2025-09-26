@@ -1,7 +1,7 @@
 
 """
 
-OCS2 Configurator
+HOC Configurator
 
 Copyright (C) Souldbminer
 
@@ -24,6 +24,8 @@ import dearpygui.dearpygui as dpg
 import common
 import kip as k
 import preset
+from defaults import d
+
 def populate():
 
     # Values in kHz
@@ -64,21 +66,40 @@ def populate():
     dpg.add_button(label="Apply Regular Preset", callback=preset.apply_reg_timings)
     dpg.add_button(label="Apply Tight Preset", callback=preset.apply_st_timings)
     dpg.add_button(label="Load Default Preset", callback=preset.load_defaults)
-    dpg.add_separator(label="Frequencies")
 
+    dpg.add_separator(label="Frequencies (Mariko)")
+    dpg.add_text("Multiple Ram Frequencies on Mariko is in development")
     dpg.add_combo(
         items=values_mhz_label_m,
         default_value="Default (1996.8 MHz)",
         label="RAM Max Frequency (Mariko)",
-        tag="m_emc_max_clock",
+        tag="marikoEmcMaxClock",
         callback=k.grab_kip_storage_values
 
     )
+
+    dpg.add_separator(label="Frequencies (Erista)")
+    dpg.add_text("Multiple Ram Frequencies on Erista is in development")
+
+    # dpg.add_combo(
+    #     items=values_mhz_label_e,
+    #     default_value="Default (2132.64 MHz)",
+    #     label="RAM Max Frequency (Erista)",
+    #     tag="e_emc_clock_1",
+    #     callback=k.grab_kip_storage_values
+    # )
+    # dpg.add_combo(
+    #     items=values_mhz_label_e,
+    #     default_value="Default (1996.8 MHz)",
+    #     label="RAM Second Frequency (Erista)",
+    #     tag="e_emc_clock_2",
+    #     callback=k.grab_kip_storage_values
+    # )
     dpg.add_combo(
         items=values_mhz_label_e,
         default_value="Default (1862.4 MHz)",
         label="RAM Max Frequency (Erista)",
-        tag="e_emc_max_clock",
+        tag="eristaEmcMaxClock",
         callback=k.grab_kip_storage_values
     )
     dpg.add_separator(label="Voltages")
@@ -87,14 +108,14 @@ def populate():
         items=voltages_mv_label,
         default_value="Default (1175 mV)",
         label="RAM Primary Voltage (VDD2)",
-        tag="emc_volt",
+        tag="commonEmcMemVolt",
         callback=k.grab_kip_storage_values
     )
     dpg.add_combo(
         items=vddq_mv_label,
         default_value="Default (600 mV)",
         label="RAM Secondary Voltage (VDDQ, Mariko ONLY)",
-        tag="m_emc_vddq",
+        tag="marikoEmcVddqVolt",
         callback=k.grab_kip_storage_values
     )
     dpg.add_combo(
@@ -102,62 +123,26 @@ def populate():
         default_value="0",
         label="SoC DVB Shift",
         callback=k.grab_kip_storage_values_no_mult,
-        tag="m_emc_dvb"
+        tag="marikoEmcDvbShift"
     )
 
     dpg.add_separator(label="Primary Timings")
-    dpg.add_combo(
-        items=["0", "1", "2"],
-        default_value="0",
-        label="MTC Preset",
-        callback=k.grab_kip_storage_values_no_mult,
-        tag="mtc"
-    )
-    dpg.add_combo(
-        items=["0 (1600bl)", "1 (1500bl)", "2 (1600bl)", "3 (1700bl)", "4 (1800bl)", "5 (1900bl)", "6 (2000bl)"],
-        default_value="0",
-        label="Latency Additive",
-        callback=k.grab_kip_storage_values_no_mult,
-        tag="m_emc_latency"
-    )
-    dpg.add_input_int(label="tRCD", tag="tRCD", callback=k.grab_kip_storage_values_no_mult)
 
-    dpg.add_input_int(label="tRAS", tag="tRAS", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_float(label="tRRD", tag="tRRD", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_int(label="tFAW", tag="tFAW", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_int(label="tWR", tag="tWR", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_int(label="tWTR", tag="tWTR", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_int(label="tRFCpb", tag="tRFCpb", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_int(label="tRFCab", tag="tRFCab", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_int(label="tRPpb", tag="tRPpb", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_int(label="tRPab", tag="tRPab", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_int(label="tREFpb", tag="tREFpb", callback=k.grab_kip_storage_values_no_mult)
+    dpg.add_combo(
+        items=["0", "2"],
+        default_value="2",
+        label="Burst Latency",
+        callback=k.grab_kip_storage_values_no_mult,
+        tag="mem_burst_latency"
+    )
+    dpg.add_slider_int(label="t1 tRCD", min_value=0, max_value=7, tag="t1_tRCD", callback=k.grab_kip_storage_values_no_mult)
+    dpg.add_slider_int(label="t2 tRP", min_value=0, max_value=7, tag="t2_tRP", callback=k.grab_kip_storage_values_no_mult)
+    dpg.add_slider_int(label="t3 tRAS", min_value=0, max_value=9, tag="t3_tRAS", callback=k.grab_kip_storage_values_no_mult)
 
     dpg.add_separator(label="Secondary Timings")
 
-    dpg.add_input_int(label="tRC", tag="tRC", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_float(label="tDQSCK_min", tag="tDQSCK_min", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_float(label="tDQSCK_max", tag="tDQSCK_max", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_float(label="tWPRE", tag="tWPRE", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_float(label="tRPST", tag="tRPST", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_float(label="tDQSS_max", tag="tDQSS_max", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_float(label="tDQS2DQ_max", tag="tDQS2DQ_max", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_float(label="tDQSQ", tag="tDQSQ", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_float(label="tRTP", tag="tRTP", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_float(label="tR2REF", tag="tR2REF", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_float(label="tXP", tag="tXP", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_float(label="tCMDCKE", tag="tCMDCKE", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_int(label="tMRWCKEL", tag="tMRWCKEL", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_float(label="tCKELCS", tag="tCKELCS", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_float(label="tCSCKEH", tag="tCSCKEH", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_float(label="tXSR", tag="tXSR", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_float(label="tCKE", tag="tCKE", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_int(label="tSR", tag="tSR", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_input_float(label="tCKCKEH", tag="tCKCKEH", callback=k.grab_kip_storage_values_no_mult)
-    dpg.add_combo(
-        items=["16", "32"],
-        default_value="16",
-        label="tBL",
-        callback=k.grab_kip_storage_values_no_mult,
-        tag="tBL"
-    )
+    dpg.add_slider_int(label="t4 tRRD", min_value=0, max_value=7, tag="t4_tRRD", callback=k.grab_kip_storage_values_no_mult)
+    dpg.add_slider_int(label="t5 tRFC", min_value=0, max_value=5, tag="t5_tRFC", callback=k.grab_kip_storage_values_no_mult)
+    dpg.add_slider_int(label="t6 tRTW", min_value=0, max_value=9, tag="t6_tRTW", callback=k.grab_kip_storage_values_no_mult)
+    dpg.add_slider_int(label="t7 tWTR", min_value=0, max_value=9, tag="t7_tWTR", callback=k.grab_kip_storage_values_no_mult)
+    dpg.add_slider_int(label="t8 tREFI", min_value=0, max_value=5, tag="t8_tREFI", callback=k.grab_kip_storage_values_no_mult)

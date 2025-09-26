@@ -1,6 +1,6 @@
 """
 
-OCS2 Configurator
+HOC Configurator
 
 Copyright (C) Souldbminer
 
@@ -25,6 +25,7 @@ import common as c
 import license
 
 def populate():
+    dpg.add_text("Horizon OC Configurator")
     dpg.add_separator(label="Contributors")
 
     with dpg.group(horizontal=True):

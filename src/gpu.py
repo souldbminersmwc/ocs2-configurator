@@ -1,7 +1,7 @@
 
 """
 
-OCS2 Configurator
+HOC Configurator
 
 Copyright (C) Souldbminer
 
@@ -24,53 +24,55 @@ import dearpygui.dearpygui as dpg
 import kip as k
 import common
 from pathlib import Path
+import ini
+
+def unimplemented():
+    pass
 
 def check_gpu_sched():
-    if(common.drive == 0):
+    if common.drive == 0:
         return False
-    ini_path = Path(common.drive + "/atmosphere/config/system_settings.ini")
+
+    ini_path = Path(common.drive) / "atmosphere/config/system_settings.ini"
     if not ini_path.exists():
         return False
+
     config = configparser.ConfigParser()
     config.read(ini_path)
 
-    try:
-        value = config["am.gpu"]["gpu_scheduling_enabled"]
-        return value.strip() == "0x1"
-    except KeyError:
-        return False
+    return config.get("am.gpu", "gpu_scheduling_enabled", fallback="0x0").strip() == "0x1"
 
 def toggle_gpu_sched(sender, app_data):
-    if(common.drive == 0):
-        common.show_popup("Error", "GPU Scheduling Toggle is unavailable for Manual Kip Selection")
-        return False
-    ini_path = Path(common.drive + "/atmosphere/config/system_settings.ini")
+
+    ini_path = Path(common.drive) / "atmosphere/config/system_settings.ini"
+
+    # Determine value
+    value = "0x1" if app_data else "0x0"
+
+    # Ensure the parent folder exists
     ini_path.parent.mkdir(parents=True, exist_ok=True)
 
-    config = configparser.ConfigParser()
-    if ini_path.exists():
-        config.read(ini_path)
+    # Update using the helper function (requires str path)
+    ini.set_ini_values(str(ini_path), "am.gpu", {"gpu_scheduling_enabled": value})
 
-    if "am.gpu" not in config:
-        config["am.gpu"] = {}
-    if app_data:
-        config["am.gpu"]["gpu_scheduling_enabled"] = "0x1"
-    else:
-        config["am.gpu"]["gpu_scheduling_enabled"] = "0x0"
-    with ini_path.open("w") as f:
-        config.write(f)
-    common.show_popup("Sucess", f"Set GPU Scheduling to {app_data}")
+    common.show_popup("Success", f"Set GPU Scheduling to {app_data}")
 
 def populate():
     offsets = list(range(0, 51, 5))
     processed_offsets = ["Disabled" if v == 0 else f"-{v} mV" for v in offsets]
     voltages = [0] + list(range(480, 960 + 1, 5))  # 0 first for Disabled
     processed_voltages = ["Disabled" if v == 0 else f"{v} mV" for v in voltages]
+    voltages_e = [0] + list(range(700, 1100 + 1, 5))  # 0 first for Disabled
+    processed_voltages_e = ["Disabled" if v == 0 else f"{v} mV" for v in voltages_e]
     processed_voltages_default = ["Default" if v == 0 else f"{v} mV" for v in voltages]
     freqs_khz = [
         76800, 153600, 230400, 307200, 384000, 460800, 537600, 614400, 691200, 768000,
         844800, 921600, 998400, 1075200, 1152000, 1228800, 1267200, 1305600, 1344000, 1382400, 1420800,
         1459200, 1497600, 1536000
+    ]
+    freqs_khz_e = [
+        76800, 153600, 230400, 307200, 384000, 460800, 537600, 614400, 691200, 768000,
+        844800, 921600, 998400, 1075200, 1152000
     ]
     freqs_mhz = [
         76.8, 153.6, 230.4, 307.2, 384.0, 460.8, 537.6, 614.4, 691.2, 768.0,
@@ -79,9 +81,6 @@ def populate():
     ]
     freqs_mhz_label = [f"{f} MHz" for f in freqs_mhz]
     
-    dpg.add_separator(label="Notice")
-    dpg.add_text("Everything in this tab other than the maximum frequency and Scheduling only works for Mariko switch units. Erista units cannot use these settings yet")
-
     dpg.add_separator(label="Frequencies")
 
     dpg.add_button(
@@ -95,11 +94,18 @@ def populate():
     )
     dpg.add_checkbox(label="GPU Scheduling", default_value=True, tag="gpu_sched", callback=toggle_gpu_sched)
     dpg.add_combo(
-        items=freqs_mhz_label,
-        default_value="921.6MHz",
-        label="GPU Max Frequency",
-        callback=k.grab_kip_storage_values,
-        tag="gpu_max_freq"
+        items=["Disabled (0)", "Enabled (1)"],
+        default_value="Disabled (0)",
+        label="Enable GPU Unsafe Frequencies (Mariko)",
+        callback=k.grab_kip_storage_values_no_mult,
+        tag="enableMarikoGpuUnsafeFreqs"
+    )
+    dpg.add_combo(
+        items=["Disabled (0)", "Enabled (1)"],
+        default_value="Disabled (0)",
+        label="Enable GPU Unsafe Frequencies (Erista)",
+        callback=k.grab_kip_storage_values_no_mult,
+        tag="enableEristaGpuUnsafeFreqs"
     )
 
     dpg.add_separator(label="Voltages")
@@ -113,20 +119,20 @@ def populate():
             small=True,
             tag="volt_info"
     )
-    dpg.add_combo(
-        items=processed_voltages,
-        default_value="Disabled",
-        label="Gpu vMin",
-        callback=k.grab_kip_storage_values_no_mult,
-        tag="g_vmin"
-    )
-    dpg.add_combo(
-        items=processed_voltages,
-        default_value="Disabled",
-        label="Gpu vMax",
-        callback=k.grab_kip_storage_values_no_mult,
-        tag="g_vmax"
-    )
+    # dpg.add_combo(
+    #     items=processed_voltages,
+    #     default_value="Disabled",
+    #     label="Gpu vMin",
+    #     callback=k.grab_kip_storage_values_no_mult,
+    #     tag="g_vmin"
+    # )
+    # dpg.add_combo(
+    #     items=processed_voltages,
+    #     default_value="Disabled",
+    #     label="Gpu vMax",
+    #     callback=k.grab_kip_storage_values_no_mult,
+    #     tag="g_vmax"
+    # )
 
     dpg.add_separator(label="Undervolt")
 
@@ -142,22 +148,31 @@ def populate():
     dpg.add_combo(
         items=["No Table (UV0)", "Regular Table (UV1)", "High Table (UV2)", "Custom Table (UV3)"],
         default_value="No Table (UV0)",
-        label="Undervolt Modes",
+        label="Mariko Undervolt Mode",
         callback=k.grab_kip_storage_values_no_mult,
-        tag="m_gpu_uv"
+        tag="marikoGpuUV"
+    )
+    dpg.add_combo(
+        items=["No Table (UV0)", "Regular Table (UV1)", "High Table (UV2)", "Custom Table (UV3)"],
+        default_value="No Table (UV0)",
+        label="Erista Undervolt Mode",
+        callback=k.grab_kip_storage_values_no_mult,
+        tag="eristaGpuUV"
     )
     dpg.add_combo(
         items=processed_offsets,
         default_value="Disabled",
-        label="Gpu Volt Offset",
+        label="GPU Volt Offset",
         callback=k.grab_kip_storage_values_no_mult,
-        tag="m_gpu_offset"
+        tag="commonGpuVoltOffset"
     )
 
-    dpg.add_separator(label="Custom Table")
+    dpg.add_separator(label="Custom Table (Mariko)")
 
     for freq in freqs_khz:
-        if(freq > 1382400):
+        if(freq > 1535000):
+            mhz_label = f"{freq / 1000:.1f} MHz"
+        elif(freq > 1382400):
             mhz_label = f"{freq / 1000:.1f} MHz (DANGEROUS)"
         elif(freq > 1152000):
             mhz_label = f"{freq / 1000:.1f} MHz (UNSAFE)"
@@ -173,7 +188,9 @@ def populate():
                     tag="g_volt_" + str(freq),
                     callback=k.grab_kip_storage_values_no_mult
                 )
+                dpg.add_text("(")
                 dpg.add_image("coolerhd", width=16, height=16)
+                dpg.add_text(")")
         else:
             dpg.add_combo(
                 items=processed_voltages,
@@ -182,3 +199,21 @@ def populate():
                 tag="g_volt_" + str(freq),
                 callback=k.grab_kip_storage_values_no_mult
             )
+
+    dpg.add_separator(label="Custom Table (Erista)")
+
+    for freq in freqs_khz_e:
+        if(freq > 1151000):
+            mhz_label = f"{freq / 1000:.1f} MHz (DANGEROUS)"
+        elif(freq > 922000):
+            mhz_label = f"{freq / 1000:.1f} MHz (UNSAFE)"
+        else:
+            mhz_label = f"{freq / 1000:.1f} MHz"
+        mhz_tag = f"combo_e_{freq}"
+        dpg.add_combo(
+            items=processed_voltages_e,
+            default_value="Disabled",
+            label=mhz_label,
+            tag="g_volt_e_" + str(freq),
+            callback=k.grab_kip_storage_values_no_mult
+        )

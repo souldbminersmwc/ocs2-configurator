@@ -1,7 +1,7 @@
 
 """
 
-OCS2 Configurator
+HOC Configurator
 
 Copyright (C) Souldbminer
 
@@ -29,6 +29,7 @@ import numpy as np
 import common as c
 import sys
 import os
+import webbrowser
 
 import kip as k
 import gpu
@@ -37,6 +38,7 @@ import ram
 from defaults import d
 import installer as ins
 import about
+import misc
 
 true = True
 false = False
@@ -91,7 +93,14 @@ with dpg.file_dialog(directory_selector=False, show=False, tag="file_dialog", wi
 
 with dpg.window(label="Configurator", width=400, height=300,id="main_window"):
     with dpg.tab_bar():
-        with dpg.tab(label="Settings"):
+        with dpg.tab(label="File"):
+            dpg.add_separator(label="Information")
+            dpg.add_text("Horizon OC is an open source overclocking tool for the Nintendo Switch Horion OS")
+            dpg.add_text("For more information read the README on GitHub")
+            dpg.add_button(
+                label="Open GitHub",
+                callback=lambda: webbrowser.open("https://github.com/souldbminersmwc/Horizon-OC")
+            )
             dpg.add_separator(label="Installation")
             dpg.add_combo(
                 items=ins.drive_list,
@@ -102,8 +111,8 @@ with dpg.window(label="Configurator", width=400, height=300,id="main_window"):
             dpg.add_text("", tag="status_text")
             dpg.add_button(label="Save kip", callback=k.write_kip)
             dpg.add_separator(label="Downloads")
-            dpg.add_button(label="Install OCS2 Loader", callback=ins.downloadLoader)
-            dpg.add_button(label="Install OCS2 sys-clk", callback=ins.downloadSysClk)
+            dpg.add_button(label="Install Horizon OC Loader", callback=ins.downloadLoader)
+            dpg.add_button(label="Install Horizon OC Clock Manager", callback=ins.downloadSysClk)
             dpg.add_separator(label="Advanced")
             dpg.add_button(label="Manually Select kip", callback=lambda: dpg.show_item("file_dialog"))
         with dpg.tab(label="GPU", tag="gpu_tab"):
@@ -115,18 +124,22 @@ with dpg.window(label="Configurator", width=400, height=300,id="main_window"):
         with dpg.tab(label="RAM", tag="emc_tab"):
             ram.populate()
 
+        with dpg.tab(label="Misc", tag="misc_tab"):
+            misc.populate()
+
         with dpg.tab(label="About", tag="about_tab"):
             about.populate()
 
         dpg.hide_item("gpu_tab")
         dpg.hide_item("cpu_tab")
         dpg.hide_item("emc_tab")
+        dpg.hide_item("misc_tab")
 
 dpg.bind_font(lexend)
 
-dpg.create_viewport(title="OCS2 Configuration", width=854, height=480)
+dpg.create_viewport(title="Horizon OC Configurator", width=854, height=480)
 dpg.set_viewport_large_icon(assets_path + "icon.ico")
-dpg.set_viewport_title("OCS2 Configurator")
+dpg.set_viewport_title("Horizon OC Configurator")
 dpg.set_primary_window("main_window", True)
 
 dpg.setup_dearpygui()

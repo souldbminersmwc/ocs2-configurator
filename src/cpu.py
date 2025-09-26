@@ -1,7 +1,7 @@
 
 """
 
-OCS2 Configurator
+HOC Configurator
 
 Copyright (C) Souldbminer
 
@@ -23,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import dearpygui.dearpygui as dpg
 import common
 import kip as k
-
+import gpu as g
 def populate():
     freqs_hz_cpu = [
         204000, 306000, 408000, 510000, 612000, 714000, 816000, 918000,
@@ -43,6 +43,9 @@ def populate():
     voltages = [0] + list(range(650, 1235 + 1, 5))  # 0 first for Disabled
     processed_voltages = ["Disabled" if v == 0 else f"{v}mV" for v in voltages]
     processed_voltages_default = ["Default" if v == 0 else f"{v}mV" for v in voltages]
+    voltages_e = [0] + list(range(650, 1260 + 1, 5))  # 0 first for Disabled
+    processed_voltages_e = ["Disabled" if v == 0 else f"{v}mV" for v in voltages_e]
+    processed_voltages_default_e = ["Default" if v == 0 else f"{v}mV" for v in voltages_e]
 
     dpg.add_separator(label="Frequencies")
 
@@ -56,18 +59,26 @@ def populate():
             tag="c_freqs_info"
     )
     dpg.add_combo(
-        items=freqs_mhz_cpu_label,
-        default_value="1785.0MHz",
-        label="CPU Max Frequency",
-        callback=k.grab_kip_storage_values,
-        tag="cpu_max_freq"
+        items=["Disabled (0)", "Enabled (1)"],
+        default_value="Disabled (0)",
+        label="Enable CPU Unsafe Frequencies (Mariko)",
+        callback=k.grab_kip_storage_values_no_mult,
+        tag="enableMarikoCpuUnsafeFreqs"
     )
+    dpg.add_combo(
+        items=["Disabled (0)", "Enabled (1)"],
+        default_value="Disabled (0)",
+        label="Enable CPU Unsafe Frequencies (Erista)",
+        callback=k.grab_kip_storage_values_no_mult,
+        tag="enableEristaCpuUnsafeFreqs"
+    )
+
     dpg.add_combo(
         items=freqs_mhz_cpu_label,
         default_value="1785.0MHz",
         label="CPU Boost Frequency",
         callback=k.grab_kip_storage_values,
-        tag="boost"
+        tag="commonCpuBoostClock"
     )
 
     dpg.add_separator(label="Voltages")
@@ -85,14 +96,14 @@ def populate():
         items=processed_voltages,
         default_value="Disabled",
         label="CPU vMax (Mariko)",
-        tag="m_cpu_max_volt",
+        tag="marikoCpuMaxVolt",
         callback=k.grab_kip_storage_values_no_mult
     )
     dpg.add_combo(
-        items=processed_voltages,
+        items=processed_voltages_e,
         default_value="Disabled",
         label="CPU vMax (Erista)",
-        tag="e_c_max_volt",
+        tag="eristaCpuMaxVolt",
         callback=k.grab_kip_storage_values_no_mult
     )
 
@@ -108,23 +119,30 @@ def populate():
         tag="c_uv_info"
     )
     dpg.add_combo(
-        items=["No Table (UV0)", "Default Table (UV1)", "High Table (UV2)"],
+        items=["0", "1", "2", "3", "4"],
         default_value="Default Table",
-        label="Undervolt",
-        tag="m_cpu_uv",
+        label="Mariko CPU Undervolt",
+        tag="marikoCpuUV",
         callback=k.grab_kip_storage_values_no_mult
     )
     dpg.add_combo(
-        items=["0","1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
-        default_value="0",
-        label="High Frequency Undervolt",
-        tag="m_cpu_huv",
+        items=["0", "1", "2", "3", "4"],
+        default_value="Default Table",
+        label="Erista CPU Undervolt",
+        tag="eristaCpuUV",
         callback=k.grab_kip_storage_values_no_mult
     )
-    dpg.add_combo(
-        items=processed_offsets,
-        default_value="Disabled",
-        label="CPU Volt Offset",
-        callback=k.grab_kip_storage_values_no_mult,
-        tag="m_cpu_hv_offset"
-    )
+    # dpg.add_combo(
+    #     items=["0","1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+    #     default_value="0",
+    #     label="High Frequency Undervolt",
+    #     tag="m_cpu_huv",
+    #     callback=k.grab_kip_storage_values_no_mult
+    # )
+    # dpg.add_combo(
+    #     items=processed_offsets,
+    #     default_value="Disabled",
+    #     label="CPU Volt Offset",
+    #     callback=k.grab_kip_storage_values_no_mult,
+    #     tag="m_cpu_hv_offset"
+    # )

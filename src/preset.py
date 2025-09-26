@@ -1,6 +1,6 @@
 """
 
-OCS2 Configurator
+HOC Configurator
 
 Copyright (C) Souldbminer
 
@@ -56,6 +56,8 @@ timing_vars = [
 
 timing_preset_default = [
     16,   # tBL
+    32,
+    15,
     140,  # tRFCpb
     280,  # tRFCab
     42,   # tRAS
@@ -91,6 +93,8 @@ timing_preset_default = [
 timing_preset_aamgcl_c = [
     # Ignore tRTW, it is autocalculated
     16,   # tBL
+    32,
+    15,
     70,  # tRFCpb
     140,  # tRFCab (tRFCpb * 2)
     28,   # tRAS
@@ -126,6 +130,8 @@ timing_preset_aamgcl_c = [
 timing_preset_aamgcl_st = [
     # Ignore tRTW, it is autocalculated
     16,   # tBL
+    32,
+    15,
     70,  # tRFCpb
     140,  # tRFCab (tRFCpb * 2)
     22,   # tRAS
@@ -160,6 +166,8 @@ timing_preset_aamgcl_st = [
 
 timing_preset_mgcj_c = [
     16,   # tBL
+    32,
+    15,
     80,  # tRFCpb
     160,  # tRFCab
     30,   # tRAS
@@ -194,6 +202,8 @@ timing_preset_mgcj_c = [
 
 timing_preset_mgcj_st = [
     16,   # tBL
+    32,
+    15,
     70,  # tRFCpb
     140,  # tRFCab
     20,   # tRAS
@@ -228,6 +238,8 @@ timing_preset_mgcj_st = [
 
 timing_preset_ab_mgcl_c = [
     16,   # tBL
+    32,
+    15,
     80,  # tRFCpb
     160,  # tRFCab
     20,   # tRAS
@@ -262,6 +274,8 @@ timing_preset_ab_mgcl_c = [
 
 timing_preset_ab_mgcl_st = [
     16,   # tBL
+    32,
+    15,
     70,  # tRFCpb
     140,  # tRFCab
     22,   # tRAS
@@ -296,6 +310,8 @@ timing_preset_ab_mgcl_st = [
 
 timing_preset_wtb_c = [
     16,   # tBL
+    32,
+    15,
     100,  # tRFCpb
     200,  # tRFCab
     28,   # tRAS
@@ -330,6 +346,8 @@ timing_preset_wtb_c = [
 
 timing_preset_wtb_st = [
     16,   # tBL
+    32,
+    15,
     100,  # tRFCpb
     200,  # tRFCab
     24,   # tRAS

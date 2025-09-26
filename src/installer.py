@@ -1,7 +1,7 @@
 
 """
 
-OCS2 Configurator
+HOC Configurator
 
 Copyright (C) Souldbminer
 
@@ -42,19 +42,19 @@ def get_drives():
 
 
 # Change if you plan to fork
-kip_download_link="https://github.com/souldbminersmwc/Switch-OC-Suite-2/releases/latest/download/loader.kip"
-sys_clk_ocs2_download_link="https://github.com/souldbminersmwc/Switch-OC-Suite-2/releases/latest/download/sys-clk-ocs2.zip"
+kip_download_link="https://github.com/souldbminersmwc/Horizon-OC/releases/latest/download/loader.kip"
+hoc_clk_download_link="https://github.com/souldbminersmwc/Horizon-OC/releases/latest/download/hoc-clk.zip"
 
 
 def downloadLoader():
-    print("Downloading ocs2.kip...")
+    print("Downloading HOC.kip...")
     if c.drive==0:
         print("Drive not selected!")
         c.show_popup(title="Error:", content="Please select a installation c.drive first!")
     else:
         try:
             directory_make = c.drive + "atmosphere/kips/"
-            urllib.request.urlretrieve(kip_download_link, directory_make + "ocs2.kip")
+            urllib.request.urlretrieve(kip_download_link, directory_make + "hoc.kip")
         except Exception as e:
             c.show_popup(title="Error", content=f"Download failed:\n{e}")
         finally:
@@ -64,20 +64,20 @@ def downloadLoader():
 def downloadSysClk():
     if c.drive == 0:
         print("Drive not selected!")
-        c.show_popup(title="Error:", content="Please select an installation c.drive first!")
+        c.show_popup(title="Error:", content="Please select an installation drive first!")
         return
 
-    zip_filename = "ocs2_clk.zip"
+    zip_filename = "hoc_clk.zip"
     zip_path = os.path.join(c.drive, zip_filename)
 
     try:
         print(f"Downloading {zip_filename} to {c.drive} ...")
-        urllib.request.urlretrieve(sys_clk_ocs2_download_link, zip_path)
+        urllib.request.urlretrieve(hoc_clk_download_link, zip_path)
 
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
             zip_ref.extractall(c.drive)
 
-        c.show_popup(title="Success", content="Installed sys-clk-ocs2!")
+        c.show_popup(title="Success", content="Installed hoc-clk!")
 
     except Exception as e:
         print(f"Download or extraction failed: {e}")
@@ -94,11 +94,11 @@ def check_atmosphere(sender, app_data, user_data):
     c.drive = app_data
     atmosphere_path = os.path.join(c.drive, "atmosphere")
     package3_path = os.path.join(atmosphere_path, "package3")
-    if os.path.isfile(f"{atmosphere_path}/kips/ocs2.kip"):
-        dpg.set_value("status_text", "OCS2 Install Found!")
-        k.kip_file_path = f"{atmosphere_path}/kips/ocs2.kip"
-        k.read_kip(c.drive + "atmosphere/kips/ocs2.kip")
-        print(f"Reading kip from c.drive {c.drive}")
+    if os.path.isfile(f"{atmosphere_path}/kips/hoc.kip"):
+        dpg.set_value("status_text", "Horizon OC Install Found!")
+        k.kip_file_path = f"{atmosphere_path}/kips/hoc.kip"
+        k.read_kip(c.drive + "atmosphere/kips/hoc.kip")
+        print(f"Reading kip from drive {c.drive}")
         k.load_all_vars()
     elif os.path.isdir(atmosphere_path) and os.path.isfile(package3_path):
         dpg.set_value("status_text", "Atmosphere install found!")
